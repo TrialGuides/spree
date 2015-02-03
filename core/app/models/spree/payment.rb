@@ -181,8 +181,6 @@ module Spree
       if store_credit?
         canceled = payment_method.cancel(response_code)
         self.void if canceled
-      else
-        super
       end
     end
 
