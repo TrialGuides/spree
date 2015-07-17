@@ -241,6 +241,7 @@ module Spree
       if amount_used > 0
         errors.add(:amount_used, 'is greater than zero. Can not delete store credit')
       end
+      errors.blank?
     end
 
     def associate_credit_type
