@@ -38,6 +38,7 @@ describe "Order" do
 
       context "there is a credit card payment" do
         let!(:cc_payment) { create(:payment, order: order) }
+        # let!(:cc_payment) { create(:payment, order: order, amount: order.total) }
 
         before do
           # callbacks recalculate total based on line items
@@ -55,7 +56,7 @@ describe "Order" do
       end
 
       context "there are no other payments" do
-        xit "adds an error to the model" do
+        it "adds an error to the model" do
           expect(subject).to be false
           expect(order.errors.full_messages).to include(Spree.t("store_credit.errors.unable_to_fund"))
         end
@@ -64,7 +65,7 @@ describe "Order" do
       context "there is a payment of an unknown type" do
         let!(:check_payment) { create(:check_payment, order: order) }
 
-        xit "raises an error" do
+        it "raises an error" do
           expect { subject }.to raise_error
         end
       end
@@ -90,7 +91,7 @@ describe "Order" do
       context "there is a payment of an unknown type" do
         let!(:check_payment) { create(:check_payment, order: order) }
 
-        xit "raises an error" do
+        it "raises an error" do
           expect { subject }.to raise_error
         end
       end
@@ -104,7 +105,7 @@ describe "Order" do
 
 
       context "there are no other payments" do
-        xit "adds an error to the model" do
+        it "adds an error to the model" do
           expect(subject).to be false
           expect(order.errors.full_messages).to include(Spree.t("store_credit.errors.unable_to_fund"))
         end
@@ -121,7 +122,7 @@ describe "Order" do
           order.reload
         end
 
-        xit "charges the outstanding balance to the credit card" do
+        it "charges the outstanding balance to the credit card" do
           expect(order.payments.count).to eq 2
           expect(order.payments.first.source).to be_a(Spree::CreditCard)
           expect(order.payments.first.amount).to eq expected_cc_total
@@ -131,7 +132,7 @@ describe "Order" do
       context "there is a payment of an unknown type" do
         let!(:check_payment) { create(:check_payment, order: order) }
 
-        xit "raises an error" do
+        it "raises an error" do
           expect { subject }.to raise_error
         end
       end

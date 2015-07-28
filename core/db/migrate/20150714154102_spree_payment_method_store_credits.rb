@@ -1,10 +1,8 @@
 class SpreePaymentMethodStoreCredits < ActiveRecord::Migration
   def up
-    return if Spree::PaymentMethod.find_by_type("Spree::PaymentMethod::StoreCredit")
-
     # Reload to pick up new position column for acts_as_list
     Spree::PaymentMethod.reset_column_information
-    Spree::PaymentMethod::StoreCredit.create(name: "Store Credit", description: "Store credit.", active: true)
+    Spree::PaymentMethod::StoreCredit.find_or_create_by(name: "Store Credit", description: "Store Credit", active: true)
   end
 
   def down
