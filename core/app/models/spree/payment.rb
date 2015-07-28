@@ -56,7 +56,6 @@ module Spree
     scope :valid, -> { where.not(state: %w(failed invalid)) }
 
     scope :store_credits, -> { where(source_type: Spree::StoreCredit.to_s) }
-    scope :not_store_credits, -> { where(arel_table[:source_type].not_eq(Spree::StoreCredit.to_s).or(arel_table[:source_type].eq(nil))) }
 
     # transaction_id is much easier to understand
     def transaction_id
@@ -270,10 +269,13 @@ module Spree
       end
 
       def invalidate_old_payments
-        return if store_credit? # store credits shouldn't invalidate other payment types
-        order.payments.with_state('checkout').where("id != ?", self.id).each do |payment|
-          payment.invalidate! unless payment.store_credit?
-        end
+        # store credits shouldn't invalidate other payment types
+        return if store_credit?
+
+        order.payments.with_state('checkout').joins(:payment_method).
+          where.not(id: self.id).
+          where.not(spree_payment_methods: { type: 'Spree::PaymentMethod::StoreCredit' }).
+          each(&:invalidate!)
       end
 
   end

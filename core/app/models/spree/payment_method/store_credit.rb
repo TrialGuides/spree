@@ -41,19 +41,17 @@ module Spree
     end
 
     def purchase(amount_in_cents, store_credit, gateway_options = {})
-      eligible_events = store_credit.store_credit_events.where(
-        amount: amount_in_cents / 100.0.to_d,
-        action: Spree::StoreCredit::ELIGIBLE_ACTION
-      )
-      event = eligible_events.find do |eligible_event|
-        store_credit.store_credit_events.where(authorization_code: eligible_event.authorization_code)
-        .where.not(action: Spree::StoreCredit::ELIGIBLE_ACTION).empty?
-      end
+      credit_events_table = Spree::StoreCreditEvent.arel_table
+      authorization_codes = store_credit.store_credit_events.
+                            where(amount: amount_in_cents / 100.0.to_d).
+                            group(:authorization_code).
+                            having(credit_events_table[:id].count.eq(1)).
+                            pluck(:authorization_code)
 
-      if event.blank?
+      if authorization_codes.empty?
         ActiveMerchant::Billing::Response.new(false, Spree.t('store_credit_payment_method.unable_to_find'), {}, {})
       else
-        capture(amount_in_cents, event.authorization_code, gateway_options)
+        capture(amount_in_cents, authorization_codes.first, gateway_options)
       end
     end
 
