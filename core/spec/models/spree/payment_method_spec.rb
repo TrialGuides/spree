@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Spree::PaymentMethod, type: :model do
   describe "#available" do
     before do
-      [nil, 'both', 'front_end', 'back_end'].each do |display_on|
+      [nil, 'both', 'front_end', 'back_end', 'unlisted'].each do |display_on|
         Spree::Gateway::Test.create(
           name: 'Display Both',
           display_on: display_on,
@@ -13,24 +13,24 @@ describe Spree::PaymentMethod, type: :model do
       end
     end
 
-    it "should have 4 total methods" do
-      expect(Spree::PaymentMethod.all.size).to eq(5)
+    it "should have 6 total methods" do
+      expect(Spree::PaymentMethod.all.size).to eq(6)
     end
 
     it "should return all methods available to front-end/back-end when no parameter is passed" do
-      expect(Spree::PaymentMethod.available.size).to eq(3)
+      expect(Spree::PaymentMethod.available.size).to eq(2)
     end
 
     it "should return all methods available to front-end/back-end when display_on = :both" do
-      expect(Spree::PaymentMethod.available(:both).size).to eq(3)
+      expect(Spree::PaymentMethod.available(:both).size).to eq(2)
     end
 
     it "should return all methods available to front-end when display_on = :front_end" do
-      expect(Spree::PaymentMethod.available(:front_end).size).to eq(3)
+      expect(Spree::PaymentMethod.available(:front_end).size).to eq(2)
     end
 
     it "should return all methods available to back-end when display_on = :back_end" do
-      expect(Spree::PaymentMethod.available(:back_end).size).to eq(3)
+      expect(Spree::PaymentMethod.available(:back_end).size).to eq(2)
     end
   end
 
